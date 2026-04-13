@@ -4,47 +4,63 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "Waveform_Structure.h"
 
-int CSV_File_Read(void) {
-    FILE *fp = fopen("power_quality_log.csv", "r");
-    if (fp == NULL) {
-        printf("CSV file does not exist\n");
-        return 1;
-    }                      //checks if file is present and opens it if so
-    char line[256];
+CSV_Data *CSV_File_Read(int *count_output) {     //output is a pointer parameter as function needs to return the number of rows as well as the array
 
-    fgets(line, sizeof(line), fp);  //excludes column names
+        FILE *fp = fopen("power_quality_log.csv", "r");
+        if (fp == NULL) {
+            printf("CSV file does not exist\n");
+            return NULL;
+        }                      //checks if file is present and opens it if so
 
-    while (fgets(line, sizeof(line), fp) != NULL) {    //separating columns
 
-        char *token = strtok(line, ",");      //first column nothing in front, just use strtok(line)
-        if (token == NULL) continue;
-        float timestamp = atof(token);
+        CSV_Data *main_array = malloc(1001 * sizeof(CSV_Data));    //dynamically allocated array creation, used so size of dataset can vary
 
-        token = strtok(NULL, ",");
-        float phase_A_voltage = atof(token);
+        if (!main_array) {
+            fprintf(stderr,"Error allocating memory for array\n"); //checks if data is present and can be allocated to the array and does not return a null pointer
+            fclose(fp);
+            return NULL;
+        }
 
-        token = strtok(NULL, ",");
-        float phase_B_voltage = atof(token);
+        char line[256];
+        int count = 0;
 
-        token = strtok(NULL, ",");
-        float phase_C_voltage = atof(token);
+        fgets(line, sizeof(line), fp);  //excludes column names
 
-        token = strtok(NULL, ",");
-        float line_current = atof(token);
+        while (fgets(line, sizeof(line), fp) && count < 1001) {   //loops through each line, stopping at the last
 
-        token = strtok(NULL, ",");
-        float frequency = atof(token);
+            char *token = strtok(line, ",");         //separating values by detecting commas as tokens
 
-        token = strtok(NULL, ",");
-        float power_factor = atof(token);
+            if (token == NULL) continue;                 // splits first value by commas
+            main_array[count].timestamp = atof(token);         // assigns split string to respective float value with atof in array
 
-        token = strtok(NULL, ",");
-        float thd_percent = atof(token);
+            token = strtok(NULL, ",");                   //repeats for all floats in that line
+            main_array[count].phase_A_voltage = atof(token);
 
-        printf("timestamp = %f, phase_A_voltage = %f, phase_B_voltage = %f, phase_C_voltage = %f, line_current = %f, frequency = %f, power_factor = %f, thd_percent = %f\n",
-               timestamp, phase_A_voltage, phase_B_voltage, phase_C_voltage, line_current, frequency, power_factor, thd_percent);
+            token = strtok(NULL, ",");
+            main_array[count].phase_B_voltage = atof(token);
+
+            token = strtok(NULL, ",");
+            main_array[count].phase_C_voltage = atof(token);
+
+            token = strtok(NULL, ",");
+            main_array[count].line_current = atof(token);
+
+            token = strtok(NULL, ",");
+            main_array[count].frequency = atof(token);
+
+            token = strtok(NULL, ",");
+            main_array[count].power_factor = atof(token);
+
+            token = strtok(NULL, ",");
+            main_array[count].thd_percent = atof(token);
+
+            count++;      //continues to next line
+        }
+
+        fclose(fp);         //closes file
+
+    *count_output = count;  //assigning collected count from here's address to a pointer so it can be accessed in analysis functions
+    return main_array;      //returning main_array instead of 0 so it can m be used in analysis functions
     }
-    fclose(fp);
-    return 0;
-}

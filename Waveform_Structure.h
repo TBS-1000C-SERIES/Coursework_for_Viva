@@ -2,8 +2,8 @@
 // Created by Zack Webber on 09/04/2026.
 //
 
-#ifndef waveform_sample
-#define	waveform_sample
+#ifndef WAVEFORM_STRUCTURE_HEADER
+#define	WAVEFORM_STRUCTURE_HEADER
 
 typedef struct  {
     float timestamp;
@@ -15,5 +15,9 @@ typedef struct  {
     float power_factor;
     float thd_percent;
 } CSV_Data;
+
+CSV_Data* CSV_File_Read(int *count_output);   //data read function has to be declared here so it can be used by other analysis and main functions later
+
+int RMS_voltage(void);    //analysis functions declared here for a cleaner main
 
 #endif
