@@ -69,7 +69,7 @@ int RMS_voltage(void) {
     return 0;
 }
 
-int Amplitude(void) {
+int Clipping_Detection(void) {
 
     int count;
     CSV_Data *main_array = CSV_File_Read(&count);    //calling file read function
@@ -112,6 +112,54 @@ int Amplitude(void) {
             printf("%d, ", line_C);
         }
     }
+
+    free(main_array);
+
+    return 0;
+}
+
+int Peak_to_Peak(void) {
+
+    int count;
+    CSV_Data *main_array = CSV_File_Read(&count);    //calling file read function
+
+    if(main_array == NULL) {
+        printf("Error: Cannot access Data");        //file access check
+        return 1;
+    }
+
+    float max_A , max_B, max_C, min_A, min_B, min_C;
+    max_A = max_B = max_C = min_A, min_B, min_C = 0;
+
+    for (CSV_Data *ptr = main_array; ptr < main_array + count; ptr++) {
+         if(ptr->phase_A_voltage >= max_A) {
+             max_A = ptr->phase_A_voltage ;
+         }else if(ptr->phase_A_voltage <= min_A) {
+             min_A = ptr->phase_A_voltage;
+         }
+    }
+    float PtP_A = max_A - min_A;
+    printf("\nPeak to Peak of A = %f\n", PtP_A);
+
+    for (CSV_Data *ptr = main_array; ptr < main_array + count; ptr++) {
+        if(ptr->phase_B_voltage >= max_B) {
+            max_B = ptr->phase_B_voltage ;
+        }else if(ptr->phase_B_voltage <= min_B) {
+            min_B = ptr->phase_B_voltage;
+        }
+    }
+    float PtP_B = max_B - min_B;
+    printf("\nPeak to Peak of B = %f\n", PtP_B);
+
+    for (CSV_Data *ptr = main_array; ptr < main_array + count; ptr++) {
+        if(ptr->phase_C_voltage >= max_C) {
+            max_C = ptr->phase_C_voltage ;
+        }else if(ptr->phase_C_voltage <= min_C) {
+            min_C = ptr->phase_C_voltage;
+        }
+    }
+    float PtP_C = max_C - min_C;
+    printf("\nPeak to Peak of C = %f\n", PtP_C);
 
     free(main_array);
 

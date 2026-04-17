@@ -6,7 +6,8 @@
 int main() {
 
     RMS_voltage();    //testing function is accessing data correctly
-    Amplitude();
+    Clipping_Detection();
+    Peak_to_Peak();
 
     return 0;
 }
