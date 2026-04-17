@@ -15,7 +15,7 @@ CSV_Data *CSV_File_Read(int *count_output) {     //output is a pointer parameter
         }                      //checks if file is present and opens it if so
 
 
-        CSV_Data *main_array = malloc(1001 * sizeof(CSV_Data));    //dynamically allocated array creation, used so size of dataset can vary
+        CSV_Data *main_array = malloc(999 * sizeof(CSV_Data));    //dynamically allocated array creation, used so size of dataset can vary
 
         if (main_array == NULL) {
             fprintf(stderr,"Error allocating memory for array\n"); //checks if data is present and can be allocated to the array and does not return a null pointer
@@ -28,7 +28,7 @@ CSV_Data *CSV_File_Read(int *count_output) {     //output is a pointer parameter
 
         fgets(line, sizeof(line), fp);  //excludes column names
 
-        while (fgets(line, sizeof(line), fp) && count < 1001) {   //loops through each line, stopping at the last
+        while (fgets(line, sizeof(line), fp) && count < 999) {   //loops through each line, stopping at the last
 
             char *token = strtok(line, ",");         //separating values by detecting commas as tokens
             if (token == NULL) continue;                 //checks if token is null before continuing so values don't become zero

@@ -71,4 +71,49 @@ int RMS_voltage(void) {
 
 int Amplitude(void) {
 
+    int count;
+    CSV_Data *main_array = CSV_File_Read(&count);    //calling file read function
+
+    if(main_array == NULL) {
+        printf("Error: Cannot access Data");        //file access check
+        return 1;
+    }
+
+    int line_A, line_B, line_C; // starting point for line numbers, starts at 2 because we skip the header and C starts counting at 0 not 1
+    line_A = line_B = line_C = 2;
+
+    int clipping_A, clipping_B, clipping_C;    // individual clipping zeros for each phase
+    clipping_A = clipping_B = clipping_C = 0;  // 0 = false, meaning no clipping detected
+
+    for (CSV_Data *ptr = main_array; ptr < main_array + count; ptr++, line_A++) {
+        if(ptr->phase_A_voltage >= 324.9 || ptr->phase_A_voltage <= -324.9) {  // checks if value is within parameters
+            if (clipping_A == 0) {
+                printf("Phase A clipping detected at lines: ");    //if a clipping value is found, prints this opening statement
+                clipping_A = 1;
+            }
+            printf("%d, ", line_A);     // adds on all subsequent instances found as loop continues
+        }
+    }
+    for (CSV_Data *ptr = main_array; ptr < main_array + count; ptr++, line_B++) {     //same loop pass for each phase
+        if(ptr->phase_B_voltage >= 324.9 || ptr->phase_B_voltage <= -324.9) {
+            if (clipping_B == 0) {
+                printf("\nPhase B clipping detected at lines: ");
+                clipping_B = 1;
+            }
+            printf("%d, ", line_B);
+        }
+    }
+    for (CSV_Data *ptr = main_array; ptr < main_array + count; ptr++, line_C++) {
+        if(ptr->phase_C_voltage >= 324.9 || ptr->phase_C_voltage <= -324.9) {
+            if (clipping_C == 0) {
+                printf("\nPhase C clipping detected at lines: ");
+                clipping_C = 1;
+            }
+            printf("%d, ", line_C);
+        }
+    }
+
+    free(main_array);
+
+    return 0;
 }

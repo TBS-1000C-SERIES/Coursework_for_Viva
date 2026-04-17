@@ -6,6 +6,7 @@
 int main() {
 
     RMS_voltage();    //testing function is accessing data correctly
+    Amplitude();
 
     return 0;
 }
