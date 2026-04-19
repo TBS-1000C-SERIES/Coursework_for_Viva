@@ -18,7 +18,7 @@ typedef struct  {
 
 CSV_Data* CSV_File_Read(int *count_output);   //data read function has to be declared here so it can be used by other analysis and main functions later
 
-int RMS_voltage(void);    //analysis functions declared here also for a cleaner main
+  //analysis functions declared here also for a cleaner main
 int Clipping_Detection(void);
 int Peak_to_Peak(void);
 

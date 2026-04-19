@@ -4,9 +4,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "Waveform_Structure.h"
+#include "waveform.h"
+#include "io.h"
 
-int RMS_voltage(void) {
+void RMS_voltage(results *values) {
 
     int count;
     CSV_Data *main_array = CSV_File_Read(&count);    //calling file read function
@@ -16,7 +17,6 @@ int RMS_voltage(void) {
 
     if(main_array == NULL) {
         printf("Error: Cannot access Data");        //file access check
-        return 1;
     }
 
     for (CSV_Data *ptr = main_array; ptr < main_array + count; ptr++) {
@@ -64,9 +64,7 @@ int RMS_voltage(void) {
 
     printf("RMS_A = %f\nRMS_B = %f\nRMS_C = %f\n", RMS_A, RMS_B, RMS_C);
 
-    free(main_array);
-
-    return 0;
+    values->RMS_A = RMS_A;
 }
 
 int Clipping_Detection(void) {
@@ -129,19 +127,19 @@ int Peak_to_Peak(void) {
     }
 
     float max_A , max_B, max_C, min_A, min_B, min_C;
-    max_A = max_B = max_C = min_A, min_B, min_C = 0;
+    max_A = max_B = max_C = min_A, min_B, min_C = 0;            //initialises variables and the start point
 
     for (CSV_Data *ptr = main_array; ptr < main_array + count; ptr++) {
          if(ptr->phase_A_voltage >= max_A) {
              max_A = ptr->phase_A_voltage ;
-         }else if(ptr->phase_A_voltage <= min_A) {
+         }else if(ptr->phase_A_voltage <= min_A) {                //loop to trial-and-error the values for min and max my going through and setting the closest match for each
              min_A = ptr->phase_A_voltage;
          }
     }
-    float PtP_A = max_A - min_A;
+    float PtP_A = max_A - min_A;                            //calculates final peak to peak value
     printf("\nPeak to Peak of A = %f\n", PtP_A);
 
-    for (CSV_Data *ptr = main_array; ptr < main_array + count; ptr++) {
+    for (CSV_Data *ptr = main_array; ptr < main_array + count; ptr++) {      //process is replicated for each phase
         if(ptr->phase_B_voltage >= max_B) {
             max_B = ptr->phase_B_voltage ;
         }else if(ptr->phase_B_voltage <= min_B) {

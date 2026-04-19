@@ -4,7 +4,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "Waveform_Structure.h"
+#include "waveform.h"
+#include "io.h"
 
 CSV_Data *CSV_File_Read(int *count_output) {     //output is a pointer parameter as function needs to return the number of rows as well as the array
 
@@ -71,3 +72,16 @@ CSV_Data *CSV_File_Read(int *count_output) {     //output is a pointer parameter
 
     return main_array;      //returning main_array instead of 0 so it can m be used in analysis functions
     }
+
+int CSV_File_Write(results *values) {
+
+    FILE *fp = fopen("Quality_report.txt", "w");
+    if (fp == NULL) {
+        printf("Report file could not be written!\n");
+        return 1;
+    }
+
+    fprintf(fp, "RMS A: %f\n", values->RMS_A);
+
+return 0;
+}
