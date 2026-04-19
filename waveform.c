@@ -41,29 +41,6 @@ void RMS_voltage(results *values) {
     float RMS_B = sqrt(sum_B / count);
     float RMS_C = sqrt(sum_C / count);
 
-    if(RMS_A >= 207 && RMS_A <= 253) {
-        printf("Phase A .... Nominal\n");
-    }
-    else {
-         printf("Phase A .... Outside Acceptable Range!\n");
-    }
-
-    if(RMS_B >= 207 && RMS_B <= 253) {
-        printf("Phase B .... Nominal\n");
-    }
-    else {
-        printf("Phase B .... Outside Acceptable Range!\n");
-    }
-
-    if(RMS_C >= 207 && RMS_C <= 253) {
-        printf("Phase C .... Nominal\n");
-    }
-    else {
-        printf("Phase C .... Outside Acceptable Range!\n");
-    }
-
-    printf("RMS_A = %f\nRMS_B = %f\nRMS_C = %f\n", RMS_A, RMS_B, RMS_C);
-
     values->RMS_A = RMS_A;
     values->RMS_B = RMS_B;
     values->RMS_C = RMS_C;
@@ -74,7 +51,31 @@ void RMS_voltage(results *values) {
     free(main_array);
 }
 
-int Clipping_Detection(void) {
+void RMS_Tolerance_Check(FILE *fp, results *values) {
+
+    if(values->RMS_A >= 207 && values->RMS_A <= 253) {
+        fprintf(fp, "\nPhase A .... Nominal\n");
+    }
+    else {
+        fprintf(fp, "Phase A .... Outside Acceptable Range!\n");
+    }
+
+    if(values->RMS_B >= 207 && values->RMS_B <= 253) {
+        fprintf(fp, "Phase B .... Nominal\n");
+    }
+    else {
+        fprintf(fp, "Phase B .... Outside Acceptable Range!\n");
+    }
+
+    if(values->RMS_C >= 207 && values->RMS_C <= 253) {
+        fprintf(fp, "Phase C .... Nominal\n");
+    }
+    else {
+        fprintf(fp, "Phase C .... Outside Acceptable Range!\n");
+    }
+}
+
+int Clipping_Detection(FILE *fp) {
 
     int count;
     CSV_Data *main_array = CSV_File_Read(&count);    //calling file read function
@@ -93,28 +94,28 @@ int Clipping_Detection(void) {
     for (CSV_Data *ptr = main_array; ptr < main_array + count; ptr++, line_A++) {
         if(ptr->phase_A_voltage >= 324.9 || ptr->phase_A_voltage <= -324.9) {  // checks if value is within parameters
             if (clipping_A == 0) {
-                printf("Phase A clipping detected at lines: ");    //if a clipping value is found, prints this opening statement
+                fprintf(fp, "Phase A clipping detected at lines: ");    //if a clipping value is found, prints this opening statement
                 clipping_A = 1;
             }
-            printf("%d, ", line_A);     // adds on all subsequent instances found as loop continues
+            fprintf(fp, "%d, ", line_A);     // adds on all subsequent instances found as loop continues
         }
     }
     for (CSV_Data *ptr = main_array; ptr < main_array + count; ptr++, line_B++) {     //same loop pass for each phase
         if(ptr->phase_B_voltage >= 324.9 || ptr->phase_B_voltage <= -324.9) {
             if (clipping_B == 0) {
-                printf("\nPhase B clipping detected at lines: ");
+                fprintf(fp, "\nPhase B clipping detected at lines: ");
                 clipping_B = 1;
             }
-            printf("%d, ", line_B);
+            fprintf(fp, "%d, ", line_B);
         }
     }
     for (CSV_Data *ptr = main_array; ptr < main_array + count; ptr++, line_C++) {
         if(ptr->phase_C_voltage >= 324.9 || ptr->phase_C_voltage <= -324.9) {
             if (clipping_C == 0) {
-                printf("\nPhase C clipping detected at lines: ");
+                fprintf(fp, "\nPhase C clipping detected at lines: ");
                 clipping_C = 1;
             }
-            printf("%d, ", line_C);
+            fprintf(fp, "%d, ", line_C);
         }
     }
 

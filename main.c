@@ -10,12 +10,11 @@ int main() {
 
     RMS_voltage(&values);
     Peak_to_Peak(&values);
-    printf("ptp_A: %f\n", values.PtP_A);
 
-    if (CSV_File_Write(&values) == 0) {
-        printf("Report generated successfully.\n");
+    if (Report_File_Write(&values) == 0) {
+        printf("Quality Report Created Successfully!\n");
     } else {
-        printf("Failed to generate report.\n");
+        printf("Failed to Create Quality Report :(\n");
     }
 
     return 0;

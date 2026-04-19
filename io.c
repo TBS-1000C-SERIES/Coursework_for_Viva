@@ -73,7 +73,7 @@ CSV_Data *CSV_File_Read(int *count_output) {     //output is a pointer parameter
     return main_array;      //returning main_array instead of 0 so it can m be used in analysis functions
     }
 
-int CSV_File_Write(results *values) {
+int Report_File_Write(results *values) {
 
     FILE *fp = fopen("Quality_report.txt", "w");
     if (fp == NULL) {
@@ -91,6 +91,11 @@ int CSV_File_Write(results *values) {
     fprintf(fp, "PtP B: %f\n", values->PtP_B);
     fprintf(fp, "PtP C: %f\n", values->PtP_C);
 
+    Clipping_Detection(fp);
+
+    RMS_Tolerance_Check(fp, values);
+
+    fclose(fp);
 
 return 0;
 }

@@ -4,6 +4,7 @@
 
 #ifndef IO_HEADER
 #define IO_HEADER
+#include <stdio.h>
 
 typedef struct {
     float RMS_A, RMS_B, RMS_C;
@@ -13,8 +14,10 @@ typedef struct {
 
 void RMS_voltage(results *values);
 void Peak_to_Peak(results *values);
+int Clipping_Detection(FILE *fp);
+void RMS_Tolerance_Check(FILE *fp, results *values);
 
-int CSV_File_Write(results *values);
+int Report_File_Write(results *values);
 
 
 
