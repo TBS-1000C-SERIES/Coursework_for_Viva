@@ -12,6 +12,7 @@ typedef struct {
 } results;
 
 void RMS_voltage(results *values);
+void Peak_to_Peak(results *values);
 
 int CSV_File_Write(results *values);
 

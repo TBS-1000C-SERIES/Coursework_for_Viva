@@ -6,14 +6,11 @@
 
 int main() {
 
-       //testing function is accessing data correctly
-    Clipping_Detection();
-    Peak_to_Peak();
-
     results values;
 
     RMS_voltage(&values);
-    printf("RMS_A: %f\n", values.RMS_A);
+    Peak_to_Peak(&values);
+    printf("ptp_A: %f\n", values.PtP_A);
 
     if (CSV_File_Write(&values) == 0) {
         printf("Report generated successfully.\n");

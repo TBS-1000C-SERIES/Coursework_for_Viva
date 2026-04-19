@@ -82,6 +82,15 @@ int CSV_File_Write(results *values) {
     }
 
     fprintf(fp, "RMS A: %f\n", values->RMS_A);
+    fprintf(fp, "RMS B: %f\n", values->RMS_B);
+    fprintf(fp, "RMS C: %f\n", values->RMS_C);
+    fprintf(fp, "Mean A: %f\n", values->mean_A);
+    fprintf(fp, "Mean B: %f\n", values->mean_B);
+    fprintf(fp, "Mean C: %f\n", values->mean_C);
+    fprintf(fp, "PtP A: %f\n", values->PtP_A);
+    fprintf(fp, "PtP B: %f\n", values->PtP_B);
+    fprintf(fp, "PtP C: %f\n", values->PtP_C);
+
 
 return 0;
 }

@@ -20,6 +20,5 @@ CSV_Data* CSV_File_Read(int *count_output);   //data read function has to be dec
 
   //analysis functions declared here also for a cleaner main
 int Clipping_Detection(void);
-int Peak_to_Peak(void);
 
 #endif
