@@ -7,19 +7,20 @@
 #include "waveform.h"
 #include "io.h"
 
-CSV_Data *CSV_File_Read(int *count_output) {     //output is a pointer parameter as function needs to return the number of rows as well as the array
+CSV_Data *CSV_File_Read(char *filename, int *count_output) {     //output is a pointer parameter as function needs to return the number of rows as well as the array
 
-        FILE *fp = fopen("power_quality_log.csv", "r");
+        FILE *fp = fopen(filename, "r");
         if (fp == NULL) {
-            printf("CSV file does not exist\n");
-            return NULL;
-        }                      //checks if file is present and opens it if so
+            fprintf(stderr, "\nCSV file does not exist\n");        //checks if file is present and opens it if so
 
+            if (count_output != NULL) *count_output = 0;       //checks count is set to 0 to prevent any "runaway loops"
+            return NULL;
+        }
 
         CSV_Data *main_array = malloc(999 * sizeof(CSV_Data));    //dynamically allocated array creation, used so size of dataset can vary
 
         if (main_array == NULL) {
-            fprintf(stderr,"Error allocating memory for array\n"); //checks if data is present and can be allocated to the array and does not return a null pointer
+            perror("Error allocating memory for array\n");     //checks if data is present and can be allocated to the array and does not return a null pointer
             fclose(fp);
             return NULL;
         }
@@ -73,29 +74,49 @@ CSV_Data *CSV_File_Read(int *count_output) {     //output is a pointer parameter
     return main_array;      //returning main_array instead of 0 so it can m be used in analysis functions
     }
 
-int Report_File_Write(results *values) {
+int Report_File_Write(results *values, char *filename) {
 
-    FILE *fp = fopen("Quality_report.txt", "w");
-    if (fp == NULL) {
-        printf("Report file could not be written!\n");
+    int count;
+    CSV_Data *main_array = CSV_File_Read(filename, &count);
+
+    if (main_array == NULL) {
         return 1;
     }
 
-    fprintf(fp, "RMS A: %f\n", values->RMS_A);
-    fprintf(fp, "RMS B: %f\n", values->RMS_B);
-    fprintf(fp, "RMS C: %f\n", values->RMS_C);
-    fprintf(fp, "Mean A: %f\n", values->mean_A);
-    fprintf(fp, "Mean B: %f\n", values->mean_B);
-    fprintf(fp, "Mean C: %f\n", values->mean_C);
-    fprintf(fp, "PtP A: %f\n", values->PtP_A);
-    fprintf(fp, "PtP B: %f\n", values->PtP_B);
-    fprintf(fp, "PtP C: %f\n", values->PtP_C);
+    FILE *fp = fopen("Quality_report.txt", "w");
 
-    Clipping_Detection(fp);
-
+    if (fp == NULL) {
+        free(main_array);
+        return 1;
+    }
+    fprintf(fp, "=================================\n");
+    fprintf(fp, "     WAVEFORM QUALITY REPORT\n");
+    fprintf(fp, "=================================\n");
     RMS_Tolerance_Check(fp, values);
+    fprintf(fp, "\nRoot Mean Square Voltage's\n");
+    fprintf(fp, "--------------------------\n");
+    fprintf(fp, "\nPhase A: %f\n", values->RMS_A);
+    fprintf(fp, "Phase B: %f\n", values->RMS_B);
+    fprintf(fp, "Phase C: %f\n", values->RMS_C);
+    fprintf(fp, "\nDC Offset's\n");
+    fprintf(fp, "-----------\n");
+    fprintf(fp, "\nPhase A: %f\n", values->mean_A);
+    fprintf(fp, "Phase B: %f\n", values->mean_B);
+    fprintf(fp, "Phase C: %f\n", values->mean_C);
+    fprintf(fp, "\nPeak to Peak Voltage's\n");
+    fprintf(fp, "----------------------\n");
+    fprintf(fp, "\nPhase A: %f\n", values->PtP_A);
+    fprintf(fp, "Phase B: %f\n", values->PtP_B);
+    fprintf(fp, "Phase C: %f\n", values->PtP_C);
+    fprintf(fp, "\nPoints out of Sensor Hard Limit (324.9V)\n");
+    fprintf(fp, "---------------------------------------\n");
+    Clipping_Detection(fp, filename);
+    fprintf(fp, "\n\n=================================\n");
+    fprintf(fp, "         END OF REPORT\n");
+    fprintf(fp, "=================================");
 
     fclose(fp);
+    free(main_array);
 
-return 0;
+    return 0;
 }

@@ -12,14 +12,11 @@ typedef struct {
     float mean_A, mean_B, mean_C;
 } results;
 
-void RMS_voltage(results *values);
-void Peak_to_Peak(results *values);
-int Clipping_Detection(FILE *fp);
+int RMS_voltage(results *values, char *filename);
+int Peak_to_Peak(results *values, char *filename);
+int Clipping_Detection(FILE *fp, char *filename);
 void RMS_Tolerance_Check(FILE *fp, results *values);
 
-int Report_File_Write(results *values);
-
-
-
+int Report_File_Write(results *values, char *filename);
 
 #endif

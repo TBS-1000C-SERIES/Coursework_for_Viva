@@ -16,7 +16,6 @@ typedef struct  {
     float thd_percent;
 } CSV_Data;
 
-CSV_Data* CSV_File_Read(int *count_output);   //data read function has to be declared here so it can be used by other analysis and main functions later
-
+CSV_Data* CSV_File_Read(char *filename, int *count_output);   //data read function has to be declared here so it can be used by other analysis and main functions later
 
 #endif

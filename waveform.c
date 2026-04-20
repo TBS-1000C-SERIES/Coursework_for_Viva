@@ -7,16 +7,16 @@
 #include "waveform.h"
 #include "io.h"
 
-void RMS_voltage(results *values) {
+int RMS_voltage(results *values, char *filename) {
 
     int count;
-    CSV_Data *main_array = CSV_File_Read(&count);    //calling file read function
+    CSV_Data *main_array = CSV_File_Read(filename, &count);    //calling file read function
 
     float sum_A, sum_B, sum_C;                    //individual sums for each phase
     sum_A = sum_B = sum_C = 0;
 
-    if(main_array == NULL) {
-        printf("Error: Cannot access Data");        //file access check
+    if(main_array == NULL) {     //file access check
+        return 1;
     }
 
     for (CSV_Data *ptr = main_array; ptr < main_array + count; ptr++) {
@@ -28,8 +28,6 @@ void RMS_voltage(results *values) {
     float mean_A = sum_A / count;
     float mean_B = sum_B / count;
     float mean_C = sum_C / count;
-
-    printf("mean_A = %f\nmean_B = %f\nmean_C = %f\n", mean_A, mean_B, mean_C);
 
     for (CSV_Data *ptr = main_array; ptr < main_array + count; ptr++) {
          sum_A += pow(ptr->phase_A_voltage, 2);
@@ -49,6 +47,8 @@ void RMS_voltage(results *values) {
     values->mean_C = mean_C;
 
     free(main_array);
+
+    return 0;
 }
 
 void RMS_Tolerance_Check(FILE *fp, results *values) {
@@ -75,13 +75,12 @@ void RMS_Tolerance_Check(FILE *fp, results *values) {
     }
 }
 
-int Clipping_Detection(FILE *fp) {
+int Clipping_Detection(FILE *fp, char *filename) {
 
     int count;
-    CSV_Data *main_array = CSV_File_Read(&count);    //calling file read function
+    CSV_Data *main_array = CSV_File_Read(filename, &count);    //calling file read function
 
-    if(main_array == NULL) {
-        printf("Error: Cannot access Data");        //file access check
+    if(main_array == NULL) {     //file access check
         return 1;
     }
 
@@ -94,7 +93,7 @@ int Clipping_Detection(FILE *fp) {
     for (CSV_Data *ptr = main_array; ptr < main_array + count; ptr++, line_A++) {
         if(ptr->phase_A_voltage >= 324.9 || ptr->phase_A_voltage <= -324.9) {  // checks if value is within parameters
             if (clipping_A == 0) {
-                fprintf(fp, "Phase A clipping detected at lines: ");    //if a clipping value is found, prints this opening statement
+                fprintf(fp, "\nPhase A clipping detected at lines: ");    //if a clipping value is found, prints this opening statement
                 clipping_A = 1;
             }
             fprintf(fp, "%d, ", line_A);     // adds on all subsequent instances found as loop continues
@@ -124,13 +123,13 @@ int Clipping_Detection(FILE *fp) {
     return 0;
 }
 
-void Peak_to_Peak(results *values) {
+int Peak_to_Peak(results *values, char *filename) {
 
     int count;
-    CSV_Data *main_array = CSV_File_Read(&count);    //calling file read function
+    CSV_Data *main_array = CSV_File_Read(filename, &count);    //calling file read function
 
-    if(main_array == NULL) {
-        printf("Error: Cannot access Data");        //file access check
+    if(main_array == NULL) {     //file access check
+        return 1;
     }
 
     float max_A , max_B, max_C, min_A, min_B, min_C;
@@ -144,7 +143,6 @@ void Peak_to_Peak(results *values) {
          }
     }
     float PtP_A = max_A - min_A;                            //calculates final peak to peak value
-    printf("\nPeak to Peak of A = %f\n", PtP_A);
 
     for (CSV_Data *ptr = main_array; ptr < main_array + count; ptr++) {      //process is replicated for each phase
         if(ptr->phase_B_voltage >= max_B) {
@@ -154,7 +152,6 @@ void Peak_to_Peak(results *values) {
         }
     }
     float PtP_B = max_B - min_B;
-    printf("\nPeak to Peak of B = %f\n", PtP_B);
 
     for (CSV_Data *ptr = main_array; ptr < main_array + count; ptr++) {
         if(ptr->phase_C_voltage >= max_C) {
@@ -164,11 +161,12 @@ void Peak_to_Peak(results *values) {
         }
     }
     float PtP_C = max_C - min_C;
-    printf("\nPeak to Peak of C = %f\n", PtP_C);
 
     values->PtP_A = PtP_A;
     values->PtP_B = PtP_B;
     values->PtP_C = PtP_C;
 
     free(main_array);
+
+    return 0;
 }
