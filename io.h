@@ -6,13 +6,13 @@
 #define IO_HEADER
 #include <stdio.h>
 
-typedef struct {
+typedef struct {                             //structure to store all number metrics that are calculated
     float RMS_A, RMS_B, RMS_C;
     float PtP_A, PtP_B, PtP_C;
     float mean_A, mean_B, mean_C;
 } results;
 
-int RMS_voltage(results *values, char *filename);
+int RMS_voltage(results *values, char *filename);         //functions defined here for later access elsewhere
 int Peak_to_Peak(results *values, char *filename);
 int Clipping_Detection(FILE *fp, char *filename);
 void RMS_Tolerance_Check(FILE *fp, results *values);

@@ -5,7 +5,7 @@
 #ifndef WAVEFORM_STRUCTURE_HEADER
 #define	WAVEFORM_STRUCTURE_HEADER
 
-typedef struct  {
+typedef struct  {                     //structure to store all columns of the data
     float timestamp;
     float phase_A_voltage;
     float phase_B_voltage;

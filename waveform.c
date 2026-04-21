@@ -7,7 +7,7 @@
 #include "waveform.h"
 #include "io.h"
 
-int RMS_voltage(results *values, char *filename) {
+int RMS_voltage(results *values, char *filename) {    //filename now included for read function
 
     int count;
     CSV_Data *main_array = CSV_File_Read(filename, &count);    //calling file read function
@@ -19,7 +19,7 @@ int RMS_voltage(results *values, char *filename) {
         return 1;
     }
 
-    for (CSV_Data *ptr = main_array; ptr < main_array + count; ptr++) {
+    for (CSV_Data *ptr = main_array; ptr < main_array + count; ptr++) {     //adding up all phases
         sum_A += ptr->phase_A_voltage;
         sum_B += ptr->phase_B_voltage;
         sum_C += ptr->phase_C_voltage;
@@ -30,7 +30,7 @@ int RMS_voltage(results *values, char *filename) {
     float mean_C = sum_C / count;
 
     for (CSV_Data *ptr = main_array; ptr < main_array + count; ptr++) {
-         sum_A += pow(ptr->phase_A_voltage, 2);
+         sum_A += pow(ptr->phase_A_voltage, 2);     //same summation but now values are squared before being surmised
          sum_B += pow(ptr->phase_B_voltage, 2);
          sum_C += pow(ptr->phase_C_voltage, 2);
     }
@@ -39,23 +39,23 @@ int RMS_voltage(results *values, char *filename) {
     float RMS_B = sqrt(sum_B / count);
     float RMS_C = sqrt(sum_C / count);
 
-    values->RMS_A = RMS_A;
+    values->RMS_A = RMS_A;     //values assigned to results array
     values->RMS_B = RMS_B;
     values->RMS_C = RMS_C;
     values->mean_A= mean_A;
     values->mean_B = mean_B;
     values->mean_C = mean_C;
 
-    free(main_array);
+    free(main_array);    //data space freed so it isn't leaked and can be used elsewhere
 
     return 0;
 }
 
-void RMS_Tolerance_Check(FILE *fp, results *values) {
+void RMS_Tolerance_Check(FILE *fp, results *values) {    //now called with file pointer so it can be written to report file directly form waveform calculations
 
     if(values->RMS_A >= 207 && values->RMS_A <= 253) {
         fprintf(fp, "\nPhase A .... Nominal\n");
-    }
+    }                                                          //checks if value is withing 10% of 230, repeated for each phase
     else {
         fprintf(fp, "Phase A .... Outside Acceptable Range!\n");
     }
@@ -75,7 +75,7 @@ void RMS_Tolerance_Check(FILE *fp, results *values) {
     }
 }
 
-int Clipping_Detection(FILE *fp, char *filename) {
+int Clipping_Detection(FILE *fp, char *filename) {    //same case as RMS tolerance check
 
     int count;
     CSV_Data *main_array = CSV_File_Read(filename, &count);    //calling file read function
@@ -94,7 +94,7 @@ int Clipping_Detection(FILE *fp, char *filename) {
         if(ptr->phase_A_voltage >= 324.9 || ptr->phase_A_voltage <= -324.9) {  // checks if value is within parameters
             if (clipping_A == 0) {
                 fprintf(fp, "\nPhase A clipping detected at lines: ");    //if a clipping value is found, prints this opening statement
-                clipping_A = 1;
+                clipping_A = 1;                                       //clipping status set to 1 once clipping is detected
             }
             fprintf(fp, "%d, ", line_A);     // adds on all subsequent instances found as loop continues
         }
@@ -162,7 +162,7 @@ int Peak_to_Peak(results *values, char *filename) {
     }
     float PtP_C = max_C - min_C;
 
-    values->PtP_A = PtP_A;
+    values->PtP_A = PtP_A;   //peak to peak values assigned to results array
     values->PtP_B = PtP_B;
     values->PtP_C = PtP_C;
 

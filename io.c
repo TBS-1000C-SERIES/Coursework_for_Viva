@@ -11,7 +11,7 @@ CSV_Data *CSV_File_Read(char *filename, int *count_output) {     //output is a p
 
         FILE *fp = fopen(filename, "r");
         if (fp == NULL) {
-            fprintf(stderr, "\nCSV file does not exist\n");        //checks if file is present and opens it if so
+            fprintf(stderr, "CSV file does not exist\n");        //checks if file is present and opens it if so
 
             if (count_output != NULL) *count_output = 0;       //checks count is set to 0 to prevent any "runaway loops"
             return NULL;
@@ -36,11 +36,11 @@ CSV_Data *CSV_File_Read(char *filename, int *count_output) {     //output is a p
             if (token == NULL) continue;                 //checks if token is null before continuing so values don't become zero
             main_array[count].timestamp = atof(token);         // assigns split string to respective float value with atof in array
 
-            token = strtok(NULL, ",");                   //repeats for all floats in that line
-            if (token == NULL) continue;                 //adding null check to every parameter    15/04
-            main_array[count].phase_A_voltage = atof(token);
-
             token = strtok(NULL, ",");
+            if (token == NULL) continue;                 //adding null check to every parameter
+            main_array[count].phase_A_voltage = atof(token);    //assigns it to the structure
+
+            token = strtok(NULL, ",");                      //repeats for all columns
             if (token == NULL) continue;
             main_array[count].phase_B_voltage = atof(token);
 
@@ -74,25 +74,25 @@ CSV_Data *CSV_File_Read(char *filename, int *count_output) {     //output is a p
     return main_array;      //returning main_array instead of 0 so it can m be used in analysis functions
     }
 
-int Report_File_Write(results *values, char *filename) {
+int Report_File_Write(results *values, char *filename) {      //report write calling assigned values and the filename pointer
 
     int count;
     CSV_Data *main_array = CSV_File_Read(filename, &count);
 
-    if (main_array == NULL) {
+    if (main_array == NULL) {                               //file access check
         return 1;
     }
 
-    FILE *fp = fopen("Quality_report.txt", "w");
+    FILE *fp = fopen("Quality_report.txt", "w");          //creating text document
 
     if (fp == NULL) {
         free(main_array);
         return 1;
     }
-    fprintf(fp, "=================================\n");
+    fprintf(fp, "=================================\n");     //writing/formatting of report file in a need way with all important metrics form the results struct.
     fprintf(fp, "     WAVEFORM QUALITY REPORT\n");
     fprintf(fp, "=================================\n");
-    RMS_Tolerance_Check(fp, values);
+    RMS_Tolerance_Check(fp, values);                       //calling function from waveform as file is being written to from there instead
     fprintf(fp, "\nRoot Mean Square Voltage's\n");
     fprintf(fp, "--------------------------\n");
     fprintf(fp, "\nPhase A: %f\n", values->RMS_A);
