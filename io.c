@@ -9,15 +9,31 @@
 
 CSV_Data *CSV_File_Read(char *filename, int *count_output) {     //output is a pointer parameter as function needs to return the number of rows as well as the array
 
-        FILE *fp = fopen(filename, "r");
+    char line[256];
+    int count = 0;
+
+        FILE *fp = fopen(filename, "r");         //first pass to first just count the number of lines and assign the array to that size
         if (fp == NULL) {
             fprintf(stderr, "CSV file does not exist\n");        //checks if file is present and opens it if so
 
-            if (count_output != NULL) *count_output = 0;       //checks count is set to 0 to prevent any "runaway loops"
+            if (count_output != NULL) *count_output = 0;       //if no lines are read, program exits safely
             return NULL;
         }
 
-        CSV_Data *main_array = malloc(999 * sizeof(CSV_Data));    //dynamically allocated array creation, used so size of dataset can vary
+    fgets(line, sizeof(line), fp);     //excludes column names
+    while (fgets(line, sizeof(line), fp) != NULL)    //counts lines
+    {
+        count++;
+    }
+    fclose(fp);
+
+    if (count == 0)
+    {
+        if (count_output != NULL) *count_output = 0;   //if no lines are read, program exits safely
+        return NULL;
+    }
+
+        CSV_Data *main_array = malloc(count * sizeof(CSV_Data));    //dynamically allocated array creation sized to the number fo lines
 
         if (main_array == NULL) {
             perror("Error allocating memory for array\n");     //checks if data is present and can be allocated to the array and does not return a null pointer
@@ -25,12 +41,11 @@ CSV_Data *CSV_File_Read(char *filename, int *count_output) {     //output is a p
             return NULL;
         }
 
-        char line[256];
-        int count = 0;
-
+        fp =fopen(filename, "r");      //second pass now assigning data to the structure
         fgets(line, sizeof(line), fp);  //excludes column names
 
-        while (fgets(line, sizeof(line), fp) && count < 999) {   //loops through each line, stopping at the last
+    for (int i = 0; i < count; i++) {
+        if (fgets(line, sizeof(line), fp) == NULL) break;
 
             char *token = strtok(line, ",");         //separating values by detecting commas as tokens
             if (token == NULL) continue;                 //checks if token is null before continuing so values don't become zero
@@ -63,8 +78,6 @@ CSV_Data *CSV_File_Read(char *filename, int *count_output) {     //output is a p
             token = strtok(NULL, ",");
             if (token == NULL) continue;
             main_array[count].thd_percent = atof(token);
-
-            count++;      //continues to next line
         }
 
         fclose(fp);         //closes file
