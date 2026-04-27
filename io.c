@@ -9,39 +9,35 @@
 
 CSV_Data *CSV_File_Read(char *filename, int *count_output) {     //output is a pointer parameter as function needs to return the number of rows as well as the array
 
-    char line[256];
+    char line[256];      //assigns buffer limit to char line
     int count = 0;
 
         FILE *fp = fopen(filename, "r");         //first pass to first just count the number of lines and assign the array to that size
-        if (fp == NULL) {
-            fprintf(stderr, "CSV file does not exist\n");        //checks if file is present and opens it if so
-
-            if (count_output != NULL) *count_output = 0;       //if no lines are read, program exits safely
+        if (fp == NULL) {      //checks file exists
             return NULL;
         }
 
     fgets(line, sizeof(line), fp);     //excludes column names
-    while (fgets(line, sizeof(line), fp) != NULL)    //counts lines
+    while (fgets(line, sizeof(line), fp) != NULL)
     {
-        count++;
+        count++;    //counts lines
     }
-    fclose(fp);
+    rewind(fp);    //function that rewinds the file pointer to the top of the file after count is finished
 
     if (count == 0)
     {
-        if (count_output != NULL) *count_output = 0;   //if no lines are read, program exits safely
-        return NULL;
+        return NULL;       //if no lines are read, program exits safely
     }
 
-        CSV_Data *main_array = malloc(count * sizeof(CSV_Data));    //dynamically allocated array creation sized to the number fo lines
+    CSV_Data *main_array = malloc(count * sizeof(CSV_Data));    //dynamically allocated array creation sized to the number fo lines
 
-        if (main_array == NULL) {
-            perror("Error allocating memory for array\n");     //checks if data is present and can be allocated to the array and does not return a null pointer
+        if (main_array == NULL)
+        {
+            perror("Error allocating memory for array\n");     //checks if data has been assigned and prints an error message to signify this
             fclose(fp);
             return NULL;
         }
 
-        fp =fopen(filename, "r");      //second pass now assigning data to the structure
         fgets(line, sizeof(line), fp);  //excludes column names
 
     for (int i = 0; i < count; i++) {
@@ -49,35 +45,35 @@ CSV_Data *CSV_File_Read(char *filename, int *count_output) {     //output is a p
 
             char *token = strtok(line, ",");         //separating values by detecting commas as tokens
             if (token == NULL) continue;                 //checks if token is null before continuing so values don't become zero
-            main_array[count].timestamp = atof(token);         // assigns split string to respective float value with atof in array
+            main_array[i].timestamp = atof(token);         // assigns split string to respective float value with atof in array
 
             token = strtok(NULL, ",");
             if (token == NULL) continue;                 //adding null check to every parameter
-            main_array[count].phase_A_voltage = atof(token);    //assigns it to the structure
+            main_array[i].phase_A_voltage = atof(token);    //assigns it to the structure
 
             token = strtok(NULL, ",");                      //repeats for all columns
             if (token == NULL) continue;
-            main_array[count].phase_B_voltage = atof(token);
+            main_array[i].phase_B_voltage = atof(token);
 
             token = strtok(NULL, ",");
             if (token == NULL) continue;
-            main_array[count].phase_C_voltage = atof(token);
+            main_array[i].phase_C_voltage = atof(token);
 
             token = strtok(NULL, ",");
             if (token == NULL) continue;
-            main_array[count].line_current = atof(token);
+            main_array[i].line_current = atof(token);
 
             token = strtok(NULL, ",");
             if (token == NULL) continue;
-            main_array[count].frequency = atof(token);
+            main_array[i].frequency = atof(token);
 
             token = strtok(NULL, ",");
             if (token == NULL) continue;
-            main_array[count].power_factor = atof(token);
+            main_array[i].power_factor = atof(token);
 
             token = strtok(NULL, ",");
             if (token == NULL) continue;
-            main_array[count].thd_percent = atof(token);
+            main_array[i].thd_percent = atof(token);
         }
 
         fclose(fp);         //closes file
@@ -85,7 +81,7 @@ CSV_Data *CSV_File_Read(char *filename, int *count_output) {     //output is a p
     *count_output = count;  //assigning collected count from here's address to a pointer so it can be accessed in analysis functions
 
     return main_array;      //returning main_array instead of 0 so it can m be used in analysis functions
-    }
+}
 
 int Report_File_Write(results *values, char *filename) {      //report write calling assigned values and the filename pointer
 
