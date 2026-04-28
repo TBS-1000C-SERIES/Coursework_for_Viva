@@ -33,3 +33,7 @@ To run the program, type ".\waveform_analyser.exe (yourlogfilename).csv"
 Program should report a successful file creation message, if not check the csv file is present in the directory and you named it right
 
 Once successful, the created Quality_Report.txt file can be found in that same directory
+
+**Link to GitHub Repository**
+
+https://github.com/TBS-1000C-SERIES/Coursework_for_Viva/edit/master/README.md
