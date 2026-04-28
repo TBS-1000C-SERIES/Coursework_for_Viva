@@ -104,19 +104,24 @@ int Report_File_Write(results *values, char *filename) {      //report write cal
     RMS_Tolerance_Check(fp, values);                       //calling function from waveform as file is being written to from there instead
     fprintf(fp, "\nRoot Mean Square Voltage's\n");
     fprintf(fp, "--------------------------\n");
-    fprintf(fp, "\nPhase A: %f\n", values->RMS_A);
-    fprintf(fp, "Phase B: %f\n", values->RMS_B);
-    fprintf(fp, "Phase C: %f\n", values->RMS_C);
+    fprintf(fp, "\nPhase A: %lf\n", values->RMS_A);
+    fprintf(fp, "Phase B: %lf\n", values->RMS_B);
+    fprintf(fp, "Phase C: %lf\n", values->RMS_C);
     fprintf(fp, "\nDC Offset's\n");
     fprintf(fp, "-----------\n");
-    fprintf(fp, "\nPhase A: %f\n", values->mean_A);
-    fprintf(fp, "Phase B: %f\n", values->mean_B);
-    fprintf(fp, "Phase C: %f\n", values->mean_C);
+    fprintf(fp, "\nPhase A: %lf\n", values->mean_A);
+    fprintf(fp, "Phase B: %lf\n", values->mean_B);
+    fprintf(fp, "Phase C: %lf\n", values->mean_C);
+    fprintf(fp, "\nStandard Deviation and Variance\n");
+    fprintf(fp, "----------------------------\n");
+    fprintf(fp, "\nPhase A: Std_Dev = %lf Variance = %lf\n",values->stddev_A ,values->var_A);
+    fprintf(fp, "Phase B: Std_Dev = %lf Variance = %lf\n",values->stddev_B ,values->var_B);
+    fprintf(fp, "Phase C: Std_Dev = %lf Variance = %lf\n",values->stddev_C ,values->var_C);
     fprintf(fp, "\nPeak to Peak Voltage's\n");
     fprintf(fp, "----------------------\n");
-    fprintf(fp, "\nPhase A: %f\n", values->PtP_A);
-    fprintf(fp, "Phase B: %f\n", values->PtP_B);
-    fprintf(fp, "Phase C: %f\n", values->PtP_C);
+    fprintf(fp, "\nPhase A: %lf\n", values->PtP_A);
+    fprintf(fp, "Phase B: %lf\n", values->PtP_B);
+    fprintf(fp, "Phase C: %lf\n", values->PtP_C);
     fprintf(fp, "\nPoints out of Sensor Hard Limit (324.9V)\n");
     fprintf(fp, "---------------------------------------\n");
     Clipping_Detection(fp, filename);
@@ -125,6 +130,7 @@ int Report_File_Write(results *values, char *filename) {      //report write cal
     fprintf(fp, "=================================");
 
     fclose(fp);
+
     free(main_array);
 
     return 0;

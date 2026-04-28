@@ -170,3 +170,44 @@ int Peak_to_Peak(results *values, char *filename) {
 
     return 0;
 }
+
+int std_dev_and_variance(results *values, char *filename) {
+
+    int count;
+    CSV_Data *main_array = CSV_File_Read(filename, &count);    //calling data
+
+    if(main_array == NULL) {     //file access check
+        return 1;
+    }
+
+    float sum_A, sum_B, sum_C;                    //individual sums for each phase
+    sum_A = sum_B = sum_C = 0;
+
+
+    for (CSV_Data *ptr = main_array; ptr < main_array + count; ptr++) {
+
+        sum_A += pow((ptr->phase_A_voltage - values->mean_A), 2);    //calculates sum of voltages - DC offset squared
+        sum_B += pow((ptr->phase_B_voltage - values->mean_B), 2);
+        sum_C += pow((ptr->phase_C_voltage - values->mean_C), 2);
+    }
+
+    float var_A = sum_A / count;    //finds variance for each phase by dividing by count
+    float var_B = sum_B / count;
+    float var_C = sum_C / count;
+
+    float stddev_A = sqrt(var_A);   //finds std dev by square rooting
+    float stddev_B = sqrt(var_B);
+    float stddev_C = sqrt(var_C);
+
+    values->stddev_A = stddev_A;   //assigns values to results structure
+    values->stddev_B = stddev_B;
+    values->stddev_C = stddev_C;
+
+    values->var_A = var_A;
+    values->var_B = var_B;
+    values->var_C = var_C;
+
+    free(main_array);
+
+    return 0;
+}
